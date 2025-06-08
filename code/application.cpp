@@ -392,8 +392,8 @@ void Application::MouseMoved( float x, float y ) {
 	m_mousePosition = newPosition;
 
 	float sensitivity = 0.01f;
-	m_cameraPositionTheta += ds.y * sensitivity;
-	m_cameraPositionPhi += ds.x * sensitivity;
+	m_cameraPositionTheta -= ds.y * sensitivity;
+	m_cameraPositionPhi -= ds.x * sensitivity;
 
 	if ( m_cameraPositionTheta < 0.14f ) {
 		m_cameraPositionTheta = 0.14f;
@@ -449,6 +449,11 @@ void Application::Keyboard( int key, int scancode, int action, int modifiers ) {
 	}
 	if ( GLFW_KEY_Y == key && ( GLFW_PRESS == action || GLFW_REPEAT == action ) ) {
 		m_stepFrame = m_isPaused && !m_stepFrame;
+	}
+
+	// Close the application with escape
+	if ( GLFW_KEY_ESCAPE == key && GLFW_RELEASE == action ) {
+		glfwSetWindowShouldClose( m_glfwWindow, true );
 	}
 }
 

@@ -20,10 +20,10 @@ Scene::~Scene
 ====================================================
 */
 Scene::~Scene() {
-	for ( size_t i = 0; i < m_bodies.size(); i++ ) {
-		delete m_bodies[ i ].m_shape;
-	}
-	m_bodies.clear();
+    for ( size_t i = 0; i < m_bodies.size(); i++ ) {
+        delete m_bodies[ i ].m_shape;
+    }
+    m_bodies.clear();
 }
 
 /*
@@ -32,12 +32,12 @@ Scene::Reset
 ====================================================
 */
 void Scene::Reset() {
-	for ( size_t i = 0; i < m_bodies.size(); i++ ) {
-		delete m_bodies[ i ].m_shape;
-	}
-	m_bodies.clear();
+    for ( size_t i = 0; i < m_bodies.size(); i++ ) {
+        delete m_bodies[ i ].m_shape;
+    }
+    m_bodies.clear();
 
-	Initialize();
+    Initialize();
 }
 
 /*
@@ -46,18 +46,20 @@ Scene::Initialize
 ====================================================
 */
 void Scene::Initialize() {
-	Body body;
-	body.m_position = Vec3( 0, 0, 0 );
-	body.m_orientation = Quat( 0, 0, 0, 1 );
-	body.m_shape = new ShapeSphere( 1.0f );
-	m_bodies.push_back( body );
+    Body body;
+    body.m_position = Vec3( 0, 0, 0 );
+    body.m_orientation = Quat( 0, 0, 0, 1 );
+    body.m_inverseMass = 1.0f;
+    body.m_shape = new ShapeSphere( 1.0f );
+    m_bodies.push_back( body );
 
-	body.m_position = Vec3( 0, 0, -101 );
-	body.m_orientation = Quat( 0, 0, 0, 1 );
-	body.m_shape = new ShapeSphere( 100.0f );
-	m_bodies.push_back( body );
+    body.m_position = Vec3( 0, 0, -101 );
+    body.m_orientation = Quat( 0, 0, 0, 1 );
+    body.m_inverseMass = 0.0f;
+    body.m_shape = new ShapeSphere( 100.0f );
+    m_bodies.push_back( body );
 
-	// TODO: Add code
+    // TODO: Add code
 }
 
 /*
@@ -65,6 +67,21 @@ void Scene::Initialize() {
 Scene::Update
 ====================================================
 */
-void Scene::Update( const float dt_sec ) {
-	// TODO: Add code
+void Scene::Update( const float dt_sec )
+{
+    for (Body& body : m_bodies)
+    {
+        // Apply gravity as an impulse
+        // I = dp, F = dp/dt => dp = F * dt => I = F * dt
+        // F = mgs
+        float mass = 1.0f / body.m_inverseMass;
+        Vec3 gravityImpulse = Vec3(0, 0, -9.81f) * mass * dt_sec;
+        body.ApplyLinearImpulse(gravityImpulse);
+    }
+
+    for (Body& body : m_bodies)
+    {
+        // Update position based on velocity
+        body.m_position += body.m_linearVelocity * dt_sec;
+    }
 }

@@ -1,5 +1,5 @@
 //
-//	Body.h
+//  Body.h
 //
 #pragma once
 #include "../Math/Vector.h"
@@ -18,10 +18,20 @@ Body
 */
 class Body {
 public:
-	Body();
+    Body();
 
-	Vec3		m_position;
-	Quat		m_orientation;
+    Vec3    m_position;
+    Quat    m_orientation;
+    Vec3    m_linearVelocity;
+    float   m_inverseMass;
 
-	Shape *		m_shape;
+    Shape*  m_shape;
+
+    Vec3    GetCenterOfMassWorldSpace() const;
+    Vec3    GetCenterOfMassModelSpace() const;
+
+    Vec3    WorldSpaceToBodySpace(Vec3 pt ) const;
+    Vec3    BodySpaceToWorldSpace(Vec3 pt ) const;
+
+    void    ApplyLinearImpulse(Vec3 impulse);
 };

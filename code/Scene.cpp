@@ -47,7 +47,7 @@ Scene::Initialize
 */
 void Scene::Initialize() {
     Body body;
-    body.m_position = Vec3( 0, 0, 0 );
+    body.m_position = Vec3( 0, 0, 10 );
     body.m_orientation = Quat( 0, 0, 0, 1 );
     body.m_inverseMass = 1.0f;
     body.m_shape = new ShapeSphere( 1.0f );
@@ -75,8 +75,27 @@ void Scene::Update( const float dt_sec )
         // I = dp, F = dp/dt => dp = F * dt => I = F * dt
         // F = mgs
         float mass = 1.0f / body.m_inverseMass;
-        Vec3 gravityImpulse = Vec3(0, 0, -9.81f) * mass * dt_sec;
+        Vec3 gravityImpulse = Vec3(0, 0, -9.81f * 10) * mass * dt_sec;
         body.ApplyLinearImpulse(gravityImpulse);
+    }
+
+    // Check for collisions
+    for (size_t i = 0; i < m_bodies.size(); ++i)
+    {
+        for (size_t j = i + 1; j < m_bodies.size(); ++j)
+        {
+            if (m_bodies[i].m_inverseMass == 0.0f && m_bodies[j].m_inverseMass == 0.0f)
+            {
+                // Both bodies are static, no response needed
+                continue;
+            }
+
+            contact_t contact;
+            if (Intersect(&m_bodies[i], &m_bodies[j], contact))
+            {
+                ResolveContact(contact);
+            }
+        }
     }
 
     for (Body& body : m_bodies)

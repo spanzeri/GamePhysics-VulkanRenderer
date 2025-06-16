@@ -50,12 +50,14 @@ void Scene::Initialize() {
     body.m_position = Vec3( 0, 0, 10 );
     body.m_orientation = Quat( 0, 0, 0, 1 );
     body.m_inverseMass = 1.0f;
+    body.m_elasticity = 0.5f;
     body.m_shape = new ShapeSphere( 1.0f );
     m_bodies.push_back( body );
 
     body.m_position = Vec3( 0, 0, -101 );
     body.m_orientation = Quat( 0, 0, 0, 1 );
     body.m_inverseMass = 0.0f;
+    body.m_elasticity = 1.0f;
     body.m_shape = new ShapeSphere( 100.0f );
     m_bodies.push_back( body );
 
@@ -67,7 +69,7 @@ void Scene::Initialize() {
 Scene::Update
 ====================================================
 */
-void Scene::Update( const float dt_sec )
+void Scene::Update(const float dt_sec)
 {
     for (Body& body : m_bodies)
     {
@@ -75,7 +77,7 @@ void Scene::Update( const float dt_sec )
         // I = dp, F = dp/dt => dp = F * dt => I = F * dt
         // F = mgs
         float mass = 1.0f / body.m_inverseMass;
-        Vec3 gravityImpulse = Vec3(0, 0, -9.81f * 10) * mass * dt_sec;
+        Vec3 gravityImpulse = Vec3(0, 0, -9.81f) * mass * dt_sec;
         body.ApplyLinearImpulse(gravityImpulse);
     }
 
@@ -100,7 +102,6 @@ void Scene::Update( const float dt_sec )
 
     for (Body& body : m_bodies)
     {
-        // Update position based on velocity
-        body.m_position += body.m_linearVelocity * dt_sec;
+        body.Update(dt_sec);
     }
 }

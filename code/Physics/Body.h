@@ -5,11 +5,8 @@
 #include "../Math/Vector.h"
 #include "../Math/Quat.h"
 #include "../Math/Matrix.h"
-#include "../Math/Bounds.h"
-#include "Shapes.h"
 
-#include "../Renderer/model.h"
-#include "../Renderer/shader.h"
+class Shape;
 
 /*
 ====================================================
@@ -23,7 +20,9 @@ public:
     Vec3    m_position;
     Quat    m_orientation;
     Vec3    m_linearVelocity;
+    Vec3    m_angularVelocity;
     float   m_inverseMass;
+    float   m_elasticity; // 0.0f = inelastic, 1.0f = elastic
 
     Shape*  m_shape;
 
@@ -33,5 +32,12 @@ public:
     Vec3    WorldSpaceToBodySpace(Vec3 pt ) const;
     Vec3    BodySpaceToWorldSpace(Vec3 pt ) const;
 
+    Mat3    GetInverseInertiaTensorBodySpace() const;
+    Mat3    GetInverseInertiaTensorWorldSpace() const;
+
+    void    Update(float dt_sec);
+
+    void    ApplyImpulse(Vec3 impulse, Vec3 position);
     void    ApplyLinearImpulse(Vec3 impulse);
+    void    ApplyAngularImpulse(Vec3 impulse);
 };

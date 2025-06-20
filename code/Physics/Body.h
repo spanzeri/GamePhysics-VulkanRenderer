@@ -23,6 +23,7 @@ public:
     Vec3    m_angularVelocity;
     float   m_inverseMass;
     float   m_elasticity; // 0.0f = inelastic, 1.0f = elastic
+    float   m_friction; // 0.0f = no friction, 1.0f = full friction
 
     Shape*  m_shape;
 

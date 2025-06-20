@@ -46,20 +46,24 @@ Scene::Initialize
 ====================================================
 */
 void Scene::Initialize() {
-    Body body;
-    body.m_position = Vec3( 0, 0, 10 );
-    body.m_orientation = Quat( 0, 0, 0, 1 );
-    body.m_inverseMass = 1.0f;
-    body.m_elasticity = 0.5f;
-    body.m_shape = new ShapeSphere( 1.0f );
-    m_bodies.push_back( body );
+    Body body1;
+    body1.m_position = Vec3( 0, 0, 10 );
+    body1.m_orientation = Quat( 0, 0, 0, 1 );
+    body1.m_linearVelocity = Vec3( 1, 0, 0 );
+    body1.m_inverseMass = 1.0f;
+    body1.m_elasticity = 0.2f;
+    body1.m_friction = 0.5f;
+    body1.m_shape = new ShapeSphere( 1.0f );
+    m_bodies.push_back( body1 );
 
-    body.m_position = Vec3( 0, 0, -101 );
-    body.m_orientation = Quat( 0, 0, 0, 1 );
-    body.m_inverseMass = 0.0f;
-    body.m_elasticity = 1.0f;
-    body.m_shape = new ShapeSphere( 100.0f );
-    m_bodies.push_back( body );
+    Body body2;
+    body2.m_position = Vec3( 0, 0, -1001 );
+    body2.m_orientation = Quat( 0, 0, 0, 1 );
+    body2.m_inverseMass = 0.0f;
+    body2.m_elasticity = 1.0f;
+    body2.m_friction = 0.5f;
+    body2.m_shape = new ShapeSphere( 1000.0f );
+    m_bodies.push_back( body2 );
 
     // TODO: Add code
 }

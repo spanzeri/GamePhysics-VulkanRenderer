@@ -11,12 +11,13 @@ Body::Body
 ====================================================
 */
 Body::Body()
-    : m_position{ 0.0f }
-    , m_orientation{ 0.0f, 0.0f, 0.0f, 1.0f }
-    , m_linearVelocity{ 0.0f }
-    , m_inverseMass( 1.0f )
-    , m_elasticity( 0.5f )
-    , m_shape( nullptr )
+    : m_position { 0.0f }
+    , m_orientation { 0.0f, 0.0f, 0.0f, 1.0f }
+    , m_linearVelocity { 0.0f }
+    , m_inverseMass { 1.0f }
+    , m_elasticity { 0.5f }
+    , m_friction { 0.1f }
+    , m_shape { nullptr }
 {
 }
 

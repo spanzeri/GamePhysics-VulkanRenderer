@@ -356,8 +356,8 @@ void FillSphere( Model & model, const float radius ) {
 		t = 100.0f;
 	}
 	t /= 100.0f;
-	float min = 5;
-	float max = 30;
+	float min = 10;
+	float max = 96;
 	float s = min * ( 1.0f - t ) + max * t;
 	FillCubeTessellated( model, (int)s );
 

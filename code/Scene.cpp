@@ -6,6 +6,8 @@
 #include "Physics/Intersections.h"
 #include "Physics/Broadphase.h"
 
+#include <algorithm>
+
 /*
 ========================================================================================================
 
@@ -47,23 +49,34 @@ Scene::Initialize
 */
 void Scene::Initialize() {
     Body body1;
-    body1.m_position = Vec3( 0, 0, 10 );
-    body1.m_orientation = Quat( 0, 0, 0, 1 );
-    body1.m_linearVelocity = Vec3( 1, 0, 0 );
+    body1.m_position = Vec3(-3, 0, 3);
+    body1.m_orientation = Quat(0, 0, 0, 1);
+    body1.m_linearVelocity = Vec3(10, 0, 0);
     body1.m_inverseMass = 1.0f;
     body1.m_elasticity = 0.2f;
     body1.m_friction = 0.5f;
-    body1.m_shape = new ShapeSphere( 1.0f );
-    m_bodies.push_back( body1 );
+    body1.m_shape = new ShapeSphere(0.5f);
+    m_bodies.push_back(body1);
 
     Body body2;
-    body2.m_position = Vec3( 0, 0, -1001 );
-    body2.m_orientation = Quat( 0, 0, 0, 1 );
+    body2.m_position = Vec3(0, 0, 2.7);
+    body2.m_orientation = Quat(0, 0, 0, 1);
+    body2.m_linearVelocity = Vec3(0, 0, 0);
     body2.m_inverseMass = 0.0f;
-    body2.m_elasticity = 1.0f;
+    body2.m_elasticity = 0.0f;
     body2.m_friction = 0.5f;
-    body2.m_shape = new ShapeSphere( 1000.0f );
-    m_bodies.push_back( body2 );
+    body2.m_shape = new ShapeSphere(0.5f);
+    m_bodies.push_back(body2);
+
+    // Ground
+    Body ground;
+    ground.m_position = Vec3(0, 0, -1001);
+    ground.m_orientation = Quat(0, 0, 0, 1);
+    ground.m_inverseMass = 0.0f;
+    ground.m_elasticity = 1.0f;
+    ground.m_friction = 0.5f;
+    ground.m_shape = new ShapeSphere(1000.0f);
+    m_bodies.push_back(ground);
 
     // TODO: Add code
 }
@@ -86,6 +99,10 @@ void Scene::Update(const float dt_sec)
     }
 
     // Check for collisions
+    int numContacts = 0;
+    int maxContacts = m_bodies.size() * (m_bodies.size() - 1) / 2;
+    contact_t *contacts = (contact_t *)alloca(maxContacts * sizeof(contact_t));
+
     for (size_t i = 0; i < m_bodies.size(); ++i)
     {
         for (size_t j = i + 1; j < m_bodies.size(); ++j)
@@ -97,15 +114,47 @@ void Scene::Update(const float dt_sec)
             }
 
             contact_t contact;
-            if (Intersect(&m_bodies[i], &m_bodies[j], contact))
+            if (Intersect(&m_bodies[i], &m_bodies[j], dt_sec, contact))
             {
-                ResolveContact(contact);
+                contacts[numContacts++] = contact;
             }
         }
     }
 
-    for (Body& body : m_bodies)
+    if (numContacts > 1)
     {
-        body.Update(dt_sec);
+        std::sort(contacts, contacts + numContacts);
+    }
+
+    float accumulatedTime = 0.0f;
+    for (int i = 0; i < numContacts; ++i)
+    {
+        contact_t& contact = contacts[i];
+        float dt = contact.timeOfImpact - accumulatedTime;
+
+        Body* bodyA = contact.bodyA;
+        Body* bodyB = contact.bodyB;
+
+        if (bodyA->m_inverseMass == 0.0f && bodyB->m_inverseMass == 0.0f)
+        {
+            continue;
+        }
+
+        for (size_t j = 0; j < m_bodies.size(); ++j)
+        {
+            m_bodies[j].Update(dt);
+        }
+
+        ResolveContact(contact);
+        accumulatedTime += contact.timeOfImpact;
+    }
+
+    float timeRemaining = dt_sec - accumulatedTime;
+    if (timeRemaining > 0.0f)
+    {
+        for (Body& body : m_bodies)
+        {
+            body.Update(dt_sec);
+        }
     }
 }

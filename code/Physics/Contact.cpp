@@ -82,10 +82,13 @@ void ResolveContact( contact_t & contact )
     //
     // Separate the colliding bodies
     //
-    float tA = bodyA->m_inverseMass / (bodyA->m_inverseMass + bodyB->m_inverseMass);
-    float tB = bodyB->m_inverseMass / (bodyA->m_inverseMass + bodyB->m_inverseMass);
+    if (contact.timeOfImpact == 0.0f)
+    {
+        float tA = bodyA->m_inverseMass / (bodyA->m_inverseMass + bodyB->m_inverseMass);
+        float tB = bodyB->m_inverseMass / (bodyA->m_inverseMass + bodyB->m_inverseMass);
 
-    Vec3 ds = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
-    bodyA->m_position += ds * tA;
-    bodyB->m_position -= ds * tB;
+        Vec3 ds = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
+        bodyA->m_position += ds * tA;
+        bodyB->m_position -= ds * tB;
+    }
 }

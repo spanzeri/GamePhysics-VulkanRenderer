@@ -21,7 +21,7 @@ public:
 
 	void Reset();
 	void Initialize();
-	void Update( const float dt_sec );	
+	void Update( const float dt_sec );
 
 	std::vector< Body > m_bodies;
 	std::vector< Constraint * >	m_constraints;

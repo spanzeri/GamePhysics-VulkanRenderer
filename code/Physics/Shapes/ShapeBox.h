@@ -2,7 +2,10 @@
 //	ShapeBox.h
 //
 #pragma once
+
 #include "ShapeBase.h"
+
+#include <vector>
 
 /*
 ====================================================

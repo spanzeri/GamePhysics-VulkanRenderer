@@ -48,6 +48,47 @@ Scene::Initialize
 ====================================================
 */
 void Scene::Initialize() {
+    // Dynamic bodies
+    for (int x = 0; x < 6; ++x)
+    {
+        for (int y = 0; y < 6; ++y)
+        {
+            float radius = 0.5f;
+            float xx = (x - 3.0f) * radius * 2.2f;
+            float yy = (y - 3.0f) * radius * 2.2f;
+            Body body;
+            body.m_position = Vec3(xx, yy, 10.0f);
+            body.m_orientation = Quat(0, 0, 0, 1);
+            body.m_linearVelocity.Zero();
+            body.m_inverseMass = 1.0f;
+            body.m_elasticity = 0.5f;
+            body.m_friction = 0.5f;
+            body.m_shape = new ShapeSphere(radius);
+            m_bodies.push_back(body);
+        }
+    }
+
+    // Floor bodies
+    for (int x = 0; x < 3; ++x)
+    {
+        for (int y = 0; y < 3; ++y)
+        {
+            float radius = 80.0f;
+            float xx = (x - 1.5f) * radius * 0.25f;
+            float yy = (y - 1.5f) * radius * 0.25f;
+            Body body;
+            body.m_position = Vec3(xx, yy, -radius);
+            body.m_orientation = Quat(0, 0, 0, 1);
+            body.m_linearVelocity.Zero();
+            body.m_inverseMass = 0.0f;
+            body.m_elasticity = 0.9f;
+            body.m_friction = 0.5f;
+            body.m_shape = new ShapeSphere(radius);
+            m_bodies.push_back(body);
+        }
+    }
+
+#if 0
     Body body1;
     body1.m_position = Vec3(-3, 0, 3);
     body1.m_orientation = Quat(0, 0, 0, 1);
@@ -77,8 +118,7 @@ void Scene::Initialize() {
     ground.m_friction = 0.5f;
     ground.m_shape = new ShapeSphere(1000.0f);
     m_bodies.push_back(ground);
-
-    // TODO: Add code
+#endif
 }
 
 /*
@@ -98,26 +138,30 @@ void Scene::Update(const float dt_sec)
         body.ApplyLinearImpulse(gravityImpulse);
     }
 
-    // Check for collisions
+    // Broad-phase collision detection
+    std::vector<collisionPair_t> collisionPairs;
+    BroadPhase(m_bodies.data(), m_bodies.size(), collisionPairs, dt_sec);
+
+    // Narrow-phase collision detection and response
     int numContacts = 0;
     int maxContacts = m_bodies.size() * (m_bodies.size() - 1) / 2;
     contact_t *contacts = (contact_t *)alloca(maxContacts * sizeof(contact_t));
 
-    for (size_t i = 0; i < m_bodies.size(); ++i)
+    for (const collisionPair_t &pair : collisionPairs)
     {
-        for (size_t j = i + 1; j < m_bodies.size(); ++j)
-        {
-            if (m_bodies[i].m_inverseMass == 0.0f && m_bodies[j].m_inverseMass == 0.0f)
-            {
-                // Both bodies are static, no response needed
-                continue;
-            }
+        Body& bodyA = m_bodies[pair.a];
+        Body& bodyB = m_bodies[pair.b];
 
-            contact_t contact;
-            if (Intersect(&m_bodies[i], &m_bodies[j], dt_sec, contact))
-            {
-                contacts[numContacts++] = contact;
-            }
+        if (bodyA.m_inverseMass == 0.0f && bodyB.m_inverseMass == 0.0f)
+        {
+            // Both bodies are static, no response needed
+            continue;
+        }
+
+        contact_t contact;
+        if (Intersect(&bodyA, &bodyB, dt_sec, contact))
+        {
+            contacts[numContacts++] = contact;
         }
     }
 
@@ -132,21 +176,13 @@ void Scene::Update(const float dt_sec)
         contact_t& contact = contacts[i];
         float dt = contact.timeOfImpact - accumulatedTime;
 
-        Body* bodyA = contact.bodyA;
-        Body* bodyB = contact.bodyB;
-
-        if (bodyA->m_inverseMass == 0.0f && bodyB->m_inverseMass == 0.0f)
-        {
-            continue;
-        }
-
         for (size_t j = 0; j < m_bodies.size(); ++j)
         {
             m_bodies[j].Update(dt);
         }
 
         ResolveContact(contact);
-        accumulatedTime += contact.timeOfImpact;
+        accumulatedTime += dt;
     }
 
     float timeRemaining = dt_sec - accumulatedTime;
@@ -154,7 +190,7 @@ void Scene::Update(const float dt_sec)
     {
         for (Body& body : m_bodies)
         {
-            body.Update(dt_sec);
+            body.Update(timeRemaining);
         }
     }
 }

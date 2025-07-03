@@ -2,7 +2,9 @@
 //	ShapeConvex.h
 //
 #pragma once
+
 #include "ShapeBase.h"
+#include <vector>
 
 struct tri_t {
 	int a;

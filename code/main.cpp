@@ -8,7 +8,8 @@
 main
 ====================================================
 */
-int main( int argc, char * argv[] ) {
+int main(int argc, char * argv[])
+{
 	g_application = new Application;
 	g_application->Initialize();
 
@@ -17,3 +18,4 @@ int main( int argc, char * argv[] ) {
 	delete g_application;
 	return 0;
 }
+

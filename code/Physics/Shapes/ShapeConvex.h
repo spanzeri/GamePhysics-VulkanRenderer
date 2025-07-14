@@ -1,53 +1,59 @@
 //
-//	ShapeConvex.h
+//  ShapeConvex.h
 //
 #pragma once
 
 #include "ShapeBase.h"
 #include <vector>
+#include <span>
 
-struct tri_t {
-	int a;
-	int b;
-	int c;
+struct Triangle {
+    int a;
+    int b;
+    int c;
 };
 
-struct edge_t {
-	int a;
-	int b;
+struct Edge
+{
+    int a;
+    int b;
 
-	bool operator == ( const edge_t & rhs ) const {
-		return ( ( a == rhs.a && b == rhs.b ) || ( a == rhs.b && b == rhs.a ) );
-	}
+    bool operator == (Edge rhs) const
+    {
+        return ((a == rhs.a && b == rhs.b) || (a == rhs.b && b == rhs.a));
+    }
 };
 
-void BuildConvexHull( const std::vector< Vec3 > & verts, std::vector< Vec3 > & hullPts, std::vector< tri_t > & hullTris );
+void BuildConvexHull(std::span<Vec3> verts, std::vector<Vec3> &hullPts, std::vector<Triangle> &hullTris );
 
 /*
 ====================================================
 ShapeConvex
 ====================================================
 */
-class ShapeConvex : public Shape {
+class ShapeConvex : public Shape
+{
 public:
-	explicit ShapeConvex( const Vec3 * pts, const int num ) {
-		Build( pts, num );
-	}
-	void Build( const Vec3 * pts, const int num );
+    explicit ShapeConvex(std::span<Vec3> pts)
+    {
+        Build(pts);
+    }
 
-	Vec3 Support( const Vec3 & dir, const Vec3 & pos, const Quat & orient, const float bias ) const override;
+    void Build(std::span<Vec3> pts);
 
-	Mat3 InertiaTensor() const override { return m_inertiaTensor; }
+    Vec3 Support(Vec3 dir, Vec3 pos, Quat orient, float bias) const override;
 
-	Bounds GetBounds( const Vec3 & pos, const Quat & orient ) const override;
-	Bounds GetBounds() const override { return m_bounds; }
+    Mat3 InertiaTensor() const override { return m_inertiaTensor; }
 
-	float FastestLinearSpeed( const Vec3 & angularVelocity, const Vec3 & dir ) const override;
+    Bounds GetBounds(Vec3 pos, Quat orient ) const override;
+    Bounds GetBounds() const override { return m_bounds; }
 
-	shapeType_t GetType() const override { return SHAPE_CONVEX; }
+    float FastestLinearSpeed(Vec3 angularVelocity, Vec3 dir) const override;
+
+    Type GetType() const override { return Type::Convex; }
 
 public:
-	std::vector< Vec3 > m_points;
-	Bounds m_bounds;
-	Mat3 m_inertiaTensor;
+    std::vector<Vec3>   m_points;
+    Bounds              m_bounds;
+    Mat3                m_inertiaTensor;
 };

@@ -397,7 +397,7 @@ bool Model::BuildFromShape( const Shape * shape ) {
 		return false;
 	}
 
-	if ( shape->GetType() == Shape::SHAPE_BOX ) {
+	if ( shape->GetType() == Shape::Type::Box ) {
 		const ShapeBox * shapeBox = (const ShapeBox *)shape;
 
 		m_vertices.clear();
@@ -412,7 +412,7 @@ bool Model::BuildFromShape( const Shape * shape ) {
 				m_vertices[ v ].xyz[ i ] += center[ i ];
 			}
 		}
-	} else if ( shape->GetType() == Shape::SHAPE_SPHERE ) {
+	} else if ( shape->GetType() == Shape::Type::Sphere ) {
 		const ShapeSphere * shapeSphere = (const ShapeSphere *)shape;
 
 		m_vertices.clear();
@@ -424,7 +424,7 @@ bool Model::BuildFromShape( const Shape * shape ) {
 				m_vertices[ v ].xyz[ i ] *= shapeSphere->m_radius;
 			}
 		}
-	} else if ( shape->GetType() == Shape::SHAPE_CONVEX ) {
+	} else if ( shape->GetType() == Shape::Type::Convex ) {
 		const ShapeConvex * shapeConvex = (const ShapeConvex *)shape;
 
 		m_vertices.clear();
@@ -432,8 +432,9 @@ bool Model::BuildFromShape( const Shape * shape ) {
 
 		// Build the connected convex hull from the points
 		std::vector< Vec3 > hullPts;
-		std::vector< tri_t > hullTris;
-		BuildConvexHull( shapeConvex->m_points, hullPts, hullTris );
+		std::vector< Triangle > hullTris;
+		std::vector<Vec3> points = shapeConvex->m_points;
+		BuildConvexHull(points, hullPts, hullTris );
 
 		// Calculate smoothed normals
 		std::vector< Vec3 > normals;
@@ -442,7 +443,7 @@ bool Model::BuildFromShape( const Shape * shape ) {
 			Vec3 norm( 0.0f );
 
 			for ( size_t t = 0; t < hullTris.size(); t++ ) {
-				const tri_t & tri = hullTris[ t ];
+				const Triangle & tri = hullTris[ t ];
 				if ( i != tri.a && i != tri.b && i != tri.c ) {
 					continue;
 				}
@@ -464,7 +465,7 @@ bool Model::BuildFromShape( const Shape * shape ) {
 		for ( int i = 0; i < (int)hullPts.size(); i++ ) {
 			vert_t vert;
 			memset( &vert, 0, sizeof( vert_t ) );
-			
+
 			vert.xyz[ 0 ] = hullPts[ i ].x;
 			vert.xyz[ 1 ] = hullPts[ i ].y;
 			vert.xyz[ 2 ] = hullPts[ i ].z;

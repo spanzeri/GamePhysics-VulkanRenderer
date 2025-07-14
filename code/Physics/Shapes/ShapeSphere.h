@@ -15,14 +15,14 @@ public:
 		m_centerOfMass.Zero();
 	}
 
-	Vec3 Support( const Vec3 & dir, const Vec3 & pos, const Quat & orient, const float bias ) const override;
+	Vec3 Support(Vec3 dir, Vec3 pos, Quat orient, float bias ) const override;
 
 	Mat3 InertiaTensor() const override;
 
-	Bounds GetBounds( const Vec3 & pos, const Quat & orient ) const override;
+	Bounds GetBounds(Vec3 pos, Quat orient ) const override;
 	Bounds GetBounds() const override;
 
-	shapeType_t GetType() const override { return SHAPE_SPHERE; }
+	Type GetType() const override { return Type::Sphere; }
 
 public:
 	float m_radius;

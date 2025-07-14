@@ -17,8 +17,8 @@ bool Intersect( Body * bodyA, Body * bodyB, contact_t & contact ) {
     contact.normal = ab;
     contact.normal.Normalize();
 
-    assert(bodyA->m_shape->GetType() == Shape::SHAPE_SPHERE);
-    assert(bodyB->m_shape->GetType() == Shape::SHAPE_SPHERE);
+    assert(bodyA->m_shape->GetType() == Shape::Type::Sphere);
+    assert(bodyB->m_shape->GetType() == Shape::Type::Sphere);
 
     ShapeSphere* sphereA = (ShapeSphere*)bodyA->m_shape;
     ShapeSphere* sphereB = (ShapeSphere*)bodyB->m_shape;
@@ -114,7 +114,7 @@ bool Intersect( Body * bodyA, Body * bodyB, const float dt, contact_t & contact 
 
     if (!bodyA || !bodyB) { return false; }
 
-    if (bodyA->m_shape->GetType() == Shape::SHAPE_SPHERE && bodyB->m_shape->GetType() == Shape::SHAPE_SPHERE) {
+    if (bodyA->m_shape->GetType() == Shape::Type::Sphere && bodyB->m_shape->GetType() == Shape::Type::Sphere) {
         ShapeSphere* sphereA = (ShapeSphere*)bodyA->m_shape;
         ShapeSphere* sphereB = (ShapeSphere*)bodyB->m_shape;
 

@@ -106,6 +106,7 @@ void AddStandardSandBox( std::vector< Body > & bodies ) {
 Scene::Initialize
 ====================================================
 */
+
 void Scene::Initialize() {
     // Dynamic bodies
     for (int x = 0; x < 6; ++x)

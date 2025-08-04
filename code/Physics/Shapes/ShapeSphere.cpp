@@ -18,7 +18,7 @@ ShapeSphere::Support
 */
 Vec3 ShapeSphere::Support(Vec3 dir, Vec3 pos, Quat orient, float bias) const
 {
-	return pos + dir * (m_radius + bias);
+    return pos + dir * (m_radius + bias);
 }
 
 /*

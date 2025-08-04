@@ -412,11 +412,24 @@ ShapeConvex::Support
 */
 Vec3 ShapeConvex::Support(Vec3 dir, Vec3 pos, Quat orient, float bias) const
 {
-    Vec3 supportPt;
+    // Find the point furthest in the direction of 'dir'
+    Vec3 max_pt = orient.RotatePoint(m_points[0]) + pos;
+    float max_dist = dir.Dot(max_pt);
 
-    // TODO: Add code
+    for (size_t i = 1; i < m_points.size(); ++i) {
+        Vec3 pt = orient.RotatePoint(m_points[i]) + pos;
+        float dist = dir.Dot(pt);
+        if (dist > max_dist) {
+            max_dist = dist;
+            max_pt = pt;
+        }
+    }
 
-    return supportPt;
+    Vec3 norm = dir;
+    norm.Normalize();
+    norm *= bias;
+
+    return max_pt + norm;
 }
 
 /*
